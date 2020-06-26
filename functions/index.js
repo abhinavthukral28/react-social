@@ -20,35 +20,34 @@ var firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = admin.firestore();
-app.get("/screams", (req, res) => {
-  db.collection("screams")
-    .orderBy("createdAt", "desc")
-    .get()
-    .then((data) => {
-      let screams = [];
-      data.docs.forEach((doc) => {
-        screams.push({ screamId: doc.id, ...doc.data() });
-      });
-
-      return res.json(screams);
-    })
-    .catch((error) => console.log(error));
+app.get("/screams", async (req, res) => {
+  try {
+    const data = await db
+      .collection("screams")
+      .orderBy("createdAt", "desc")
+      .get();
+    let screams = [];
+    data.docs.forEach((doc) => {
+      screams.push({ screamId: doc.id, ...doc.data() });
+    });
+    return res.status(200).json(screams);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
-app.post("/screams", (request, response) => {
+app.post("/screams", async (request, response) => {
   const newScream = {
     body: request.body.body,
     userHandle: request.body.userHandle,
     createdAt: new Date().toISOString(),
   };
-  db.collection("screams")
-    .add(newScream)
-    .then((doc) => {
-      response.json({ message: `document ${doc.id} created` });
-    })
-    .catch((error) => {
-      response.status(500).json({ error: "Something went wrong" });
-    });
+  try {
+    const doc = await db.collection("screams").add(newScream);
+    response.status(200).json({ message: `document ${doc.id} created` });
+  } catch (err) {
+    response.status(500).json({ error: "Something went wrong" });
+  }
 });
 const isEmpty = (string) => {
   return string.trim() === "" ? true : false;
