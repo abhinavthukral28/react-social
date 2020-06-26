@@ -36,10 +36,36 @@ app.get("/screams", async (req, res) => {
   }
 });
 
-app.post("/screams", async (request, response) => {
+const FBAuth = async (request, response, next) => {
+  if (
+    request.headers.authorization &&
+    request.headers.authorization.startsWith("Bearer ")
+  ) {
+    const idToken = request.headers.authorization.split("Bearer ")[1];
+    try {
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      request.user = decodedToken;
+      const data = await db
+        .collection("users")
+        .where("userId", "==", request.user.uid)
+        .limit(1)
+        .get();
+      request.user.handle = data.docs[0].data().handle;
+      console.log(data.docs);
+
+      return next();
+    } catch (err) {
+      console.log(err);
+      response.status(403).json({ error: err });
+    }
+  } else {
+    return response.status(403).json({ error: "Unauthorized" });
+  }
+};
+app.post("/screams", FBAuth, async (request, response) => {
   const newScream = {
     body: request.body.body,
-    userHandle: request.body.userHandle,
+    userHandle: request.user.handle,
     createdAt: new Date().toISOString(),
   };
   try {
@@ -89,6 +115,7 @@ app.post("/signup", async (request, response) => {
       const userCredentials = {
         userId: addUserRequest.user.uid,
         email: addUserRequest.user.email,
+        handle: newUser.handle,
         createdAt: new Date().toISOString(),
       };
       const addUser = await db
@@ -119,6 +146,7 @@ app.post("/login", async (request, response) => {
         .signInWithEmailAndPassword(user.email, user.password);
 
       const token = await login.user.getIdToken();
+      console.log(token);
 
       return response.status(200).json({ token });
     } catch (err) {
