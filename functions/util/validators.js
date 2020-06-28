@@ -26,7 +26,7 @@ exports.validateSignUpData = (newUser) => {
   };
 };
 
-exports.validateLogin = (userData) => {
+exports.validateLogin = (user) => {
   let errors = {};
   if (isEmpty(user.email)) errors.email = "Email cannot be empty";
   else if (!isEmail(user.email)) errors.email = "Invalid Email";
