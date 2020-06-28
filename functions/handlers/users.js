@@ -73,6 +73,9 @@ exports.uploadImage = async (request, response) => {
   let imageFilename = null;
 
   busboy.on("file", (fieldName, file, filename, encoding, mimetype) => {
+    if (mimetype !== "image/jpeg" && mimetype !== "image/png") {
+      return response.status(400).json({ error: "Image is not png/jpeg" });
+    }
     const imageExtension = filename.split(".")[filename.split(".").length - 1];
 
     imageFilename = `${Math.round(
