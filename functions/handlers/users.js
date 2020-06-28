@@ -73,8 +73,7 @@ exports.uploadImage = async (request, response) => {
   let imageFilename = null;
 
   busboy.on("file", (fieldName, file, filename, encoding, mimetype) => {
-    const imageExtension = filename.split(".")[filename.split().length - 1];
-    console.log(filename.split(".")[filename.split().length - 1]);
+    const imageExtension = filename.split(".")[filename.split(".").length - 1];
 
     imageFilename = `${Math.round(
       Math.random() * 10000000000
