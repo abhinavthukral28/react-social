@@ -1,4 +1,17 @@
 let [db] = {
+  users: [
+    {
+      userId: "jf;lasdkjflajwejrerw",
+      email: "user@email.com",
+      handle: "user",
+      createdAt: new Date(),
+      imageUrl: "images/fdsafasd/",
+      bio: "Hello World",
+      website: "https://user.com",
+      location: "london",
+    },
+  ],
+
   screams: [
     {
       userHandle: "user",
