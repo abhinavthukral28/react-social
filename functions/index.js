@@ -12,6 +12,7 @@ app.post("/screams", FBAuth, createOneScream);
 //User Routes
 app.post("/signup", signUp);
 app.post("/login", login);
+app.post("/user", FBAuth, addUserDetails);
 app.post("/user/image", FBAuth, uploadImage);
 
 exports.api = functions.region("asia-east2").https.onRequest(app);
