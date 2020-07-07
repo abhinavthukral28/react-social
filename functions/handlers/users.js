@@ -1,7 +1,11 @@
 const { admin, db } = require("../util/admin");
 const firebase = require("firebase");
 const config = require("../util/config");
-const { validateSignUpData, validateLogin } = require("../util/validators");
+const {
+  validateSignUpData,
+  validateLogin,
+  reduceUserDetails,
+} = require("../util/validators");
 firebase.initializeApp(config);
 const noImg = "no-img.png";
 exports.signUp = async (request, response) => {
@@ -111,4 +115,15 @@ exports.uploadImage = async (request, response) => {
     }
   });
   busboy.end(request.rawBody);
+};
+exports.addUserDetails = async (request, response) => {
+  let userDetails = reduceUserDetails(request.body);
+  try {
+    const commit = await db
+      .doc(`/users/${request.user.handle}`)
+      .update(userDetails);
+  } catch (error) {
+    console.log(error);
+    return response.status(500).json({ error: error.code });
+  }
 };
